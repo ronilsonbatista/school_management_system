@@ -38,7 +38,7 @@ class AllClassesSchema(ma.SQLAlchemyAutoSchema):
 
 all_classes_schema = AllClassesSchema(many = True)
 
-@app.route("/tasks")
+@app.route("/api/tasks", methods=["GET"])
 def class_list():
     classes = Class.query.all()
     schema = all_classes_schema.dump(classes)
