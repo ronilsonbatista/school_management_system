@@ -14,7 +14,7 @@
     <h1>Para submeter a tarefa digite o Código da Disciplina </h1>
 
 
-    <form action="" method="post">
+    <form action="{{ url_for('take_submitted') }} " method="post">
         <div class="mb-3">
             <label for="classcode" class="form-label"></label>
             <input type="text" class="form-control" id="classcode" name="classcode">

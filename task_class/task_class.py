@@ -1,4 +1,5 @@
-from config import app, db, ma
+import os.path
+from config import app, db, ma, database_file, project_dir
 from flask import jsonify, render_template, request
 
 task_identifier = db.Table(
@@ -37,10 +38,6 @@ class AllClassesSchema(ma.SQLAlchemyAutoSchema):
         fields = ["classname", "classcode", "tasks"]
 
 all_classes_schema = AllClassesSchema(many = True)
-
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("index.html")
 
 @app.route("/api/tasks", methods=["GET"])
 def class_list():
