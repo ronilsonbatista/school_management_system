@@ -12,6 +12,22 @@ from ServiceMapping import ClassServiceHandler
 from ServiceMapping import TaskServiceHandler
 
 
+class Submitted(db.Model):
+    __tablename__ = "submitted_task"
+    id = db.Column(db.Integer, primary_key=True)
+    student_name = db.Column(db.String(256), nullable=False)
+    student_id = db.Column(db.Integer(), nullable=False)
+    classcode = db.Column(db.String(256), nullable=False)
+    classname = db.Column(db.String(256), nullable=False)
+    task = db.Column(db.String(256), nullable=False)
+    is_corrected = db.Column(db.Boolean, nullable=False)
+
+class SubmittedSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Submitted
+
+all_submitted_task_schema = SubmittedSchema(many = True)
+
 task_identifier = db.Table(
         "task_identifier",
         db.Column("classcode", db.String, db.ForeignKey("class.classcode")),
@@ -50,30 +66,29 @@ class AllClassesSchema(ma.SQLAlchemyAutoSchema):
 all_classes_schema = AllClassesSchema(many = True)
 
 
-@app.route("/", methods=["GET"])
+@app.route("/api/class/submitted/code", methods=["GET"])
 def home():
     return render_template("index.html")
 
-@app.route("/submitted/", methods=["POST"])
+@app.route("/api/submitted/", methods=["POST"])
 def take_submitted():
     classcode = request.form["classcode"]
 
     _task = TaskServiceHandler(classcode=classcode).get()
     task = _task.get('tasks')
-    #  print(_task.get('task'))
-
+    
     _class = ClassServiceHandler(classcode=classcode).get()
     classname = _class.get('classname')
     students = _class.get('students')
 
     return render_template("submitted.html",
                            students=students,
-                           date=  task,
+                           tasks =  task,
                            classcode=classcode,
                            classname=classname)
 
 
-@app.route("/api/classroom/attendence", methods=["POST"])
+@app.route("/api/submitted/task", methods=["POST"])
 def post_attendence():
     enum_presence = request.form["presence"]
     new_data = {
@@ -81,13 +96,22 @@ def post_attendence():
         "classname" : request.form["classname"],
         "student_name" : request.form["student_name"],
         "student_id" : int(request.form["student_id"]),
-        "date" : parser.parse(request.form["date"]),
-        "presence" : PresenceEnum(enum_presence)
+        "task" : request.form["presence"],
+        "is_corrected" : bool(False)
+
     }
-    classroom = Classroom(**new_data)
-    db.session.add(classroom)
+
+    submitted = Submitted(**new_data)
+    db.session.add(submitted)
     db.session.commit()
     return "OK"
 
+@app.route("/api/submitted/list", methods=["GET"])
+def submitted_list():
+    result = Submitted.query.all()
+    return jsonify(all_submitted_task_schema.dump(result))
+
 if __name__ == "__main__":
+    if not os.path.exists(database_file):
+        db.create_all()
     app.run(host="0.0.0.0", port=12304, debug=True)

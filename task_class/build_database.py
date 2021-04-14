@@ -17,7 +17,6 @@ CLASSES = [
 if os.path.exists(database_name):
     os.remove(database_name)
 
-
 db.create_all()
 
 for _class in CLASSES:
