@@ -9,6 +9,7 @@ from dateutil import parser
 import sys
 sys.path.insert(1, f"{project_dir}/../services/")
 from ServiceMapping import ClassServiceHandler
+from ServiceMapping import TaskServiceHandler
 
 
 task_identifier = db.Table(
@@ -49,7 +50,6 @@ class AllClassesSchema(ma.SQLAlchemyAutoSchema):
 all_classes_schema = AllClassesSchema(many = True)
 
 
-
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
@@ -58,14 +58,17 @@ def home():
 def take_submitted():
     classcode = request.form["classcode"]
 
+    _task = TaskServiceHandler(classcode=classcode).get()
+    task = _task.get('tasks')
+    #  print(_task.get('task'))
+
     _class = ClassServiceHandler(classcode=classcode).get()
     classname = _class.get('classname')
     students = _class.get('students')
 
-    
     return render_template("submitted.html",
                            students=students,
-                           date=  "onnection",
+                           date=  task,
                            classcode=classcode,
                            classname=classname)
 

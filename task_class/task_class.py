@@ -30,20 +30,19 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
         model = Task
         fields = ["task", "id"]
 
-
-class AllClassesSchema(ma.SQLAlchemyAutoSchema):
+        
+class ClassSchema(ma.SQLAlchemyAutoSchema):
     tasks = ma.Nested(TaskSchema, many=True)
     class Meta:
         model = Class
         fields = ["classname", "classcode", "tasks"]
 
-all_classes_schema = AllClassesSchema(many = True)
+class_schema = ClassSchema()
 
-@app.route("/api/tasks", methods=["GET"])
-def class_list():
-    classes = Class.query.all()
-    schema = all_classes_schema.dump(classes)
-    return jsonify(schema)
+@app.route("/api/tasks/<classcode>", methods=["GET"])
+def class_detail(classcode):
+    classes = Class.query.get(classcode)
+    return class_schema.jsonify(classes)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=12303, debug=True)

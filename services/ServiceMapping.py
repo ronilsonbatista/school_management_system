@@ -20,3 +20,16 @@ class ClassServiceHandler(ServiceHandler):
 if __name__ == "__main__":
     csh = ClassServiceHandler(classcode="21E1_1")
     print(csh.get())
+
+
+
+class TaskServiceHandler(ServiceHandler):
+    endpoint = "http://localhost:12303/api/tasks"
+
+    def __init__(self, **kwargs):
+        classcode = kwargs.get('classcode')
+        self.endpoint = f"{self.endpoint}/{classcode}"
+
+if __name__ == "__main__":
+    csh = TaskServiceHandler(classcode="21E1_1")
+    print(csh.get())
