@@ -33,3 +33,14 @@ class TaskServiceHandler(ServiceHandler):
 if __name__ == "__main__":
     csh = TaskServiceHandler(classcode="21E1_1")
     print(csh.get())
+
+
+class SubmittedServiceHandler(ServiceHandler):
+    endpoint = "http://localhost:12304/api/submitted/list"
+
+    def __init__(self, **kwargs):
+        self.endpoint = f"{self.endpoint}"
+
+if __name__ == "__main__":
+    csh = SubmittedServiceHandler()
+    print(csh.get())

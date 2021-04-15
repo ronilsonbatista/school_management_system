@@ -1,9 +1,6 @@
 import os.path
 from config import app, db, ma, database_file, project_dir
 from flask import jsonify, render_template, request
-
-from enum import Enum
-from marshmallow_enum import EnumField
 from dateutil import parser
 
 import sys
@@ -13,18 +10,21 @@ from ServiceMapping import TaskServiceHandler
 
 
 class Submitted(db.Model):
-    __tablename__ = "submitted_task"
+    __tablename__ = "submitted_task_"
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(256), nullable=False)
     student_id = db.Column(db.Integer(), nullable=False)
     classcode = db.Column(db.String(256), nullable=False)
     classname = db.Column(db.String(256), nullable=False)
+    task_id = db.Column(db.Integer(), nullable=False)
     task = db.Column(db.String(256), nullable=False)
     is_corrected = db.Column(db.Boolean, nullable=False)
 
 class SubmittedSchema(ma.SQLAlchemyAutoSchema):
+    submitted = ma.Nested(Submitted, many=True)
     class Meta:
         model = Submitted
+        # fields = ["task"]
 
 all_submitted_task_schema = SubmittedSchema(many = True)
 
@@ -90,15 +90,14 @@ def take_submitted():
 
 @app.route("/api/submitted/task", methods=["POST"])
 def post_attendence():
-    enum_presence = request.form["presence"]
     new_data = {
         "classcode" : request.form["classcode"],
         "classname" : request.form["classname"],
         "student_name" : request.form["student_name"],
         "student_id" : int(request.form["student_id"]),
         "task" : request.form["presence"],
-        "is_corrected" : bool(False)
-
+        "task_id" : int(request.form["task_id"]),
+        "is_corrected" : bool(False),
     }
 
     submitted = Submitted(**new_data)
