@@ -42,11 +42,11 @@ class ClassroomSchema(ma.SQLAlchemyAutoSchema):
 classroom_schema = ClassroomSchema()
 all_classroom_schema = ClassroomSchema(many = True)
 
-@app.route("/", methods=["GET"])
+@app.route("/api/attendence/code", methods=["GET"])
 def home():
     return render_template("index.html")
 
-@app.route("/attendence/", methods=["POST"])
+@app.route("/api/attendence/", methods=["POST"])
 def take_attendence():
     classcode = request.form["classcode"]
     date = request.form["date"]
@@ -82,8 +82,6 @@ def post_attendence():
 def classroom_list():
     result = Classroom.query.all()
     return jsonify(all_classroom_schema.dump(result))
-
-
 
 if __name__ == "__main__":
     if not os.path.exists(database_file):
